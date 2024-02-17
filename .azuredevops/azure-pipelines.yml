@@ -23,8 +23,8 @@ steps:
   fetchTags: true
   clean: true
 
-- task: UseDotNet@3
-  displayName: 'Install .Net 6 SDK'
+- task: UseDotNet@2
+  displayName: 'Install .Net 8 SDK'
   inputs:
     packageType: 'sdk'
     version: '8.0.x'

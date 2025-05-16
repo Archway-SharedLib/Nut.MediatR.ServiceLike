@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using FluentAssertions;
+using Shouldly;
 using MediatR;
 using Xunit;
 
@@ -11,68 +11,63 @@ public class MediatorServiceDescriptionTest
     [Fact]
     public void Create_引数がnullの場合は例外が発行される()
     {
-        Action act = () => MediatorServiceDescription.Create(null);
-        act.Should().Throw<ArgumentNullException>();
+        Should.Throw<ArgumentNullException>(() => MediatorServiceDescription.Create(null));
     }
 
     [Fact]
     public void Create_引数の型のGenericがオープンしてたら例外が発行される()
     {
-        Action act = () => MediatorServiceDescription.Create(typeof(TestOpenGenericRequest<>));
-        act.Should().Throw<ArgumentException>();
+        Should.Throw<ArgumentException>(() => MediatorServiceDescription.Create(typeof(TestOpenGenericRequest<>)));
     }
 
     [Fact]
     public void Create_引数の型が実装型じゃない場合例外が発行される()
     {
-        Action act = () => MediatorServiceDescription.Create(typeof(TestAbstractRequest));
-        act.Should().Throw<ArgumentException>();
+        Should.Throw<ArgumentException>(() => MediatorServiceDescription.Create(typeof(TestAbstractRequest)));
     }
 
     [Fact]
     public void Create_引数の型がIRequestを継承していない場合例外が発行される()
     {
-        Action act = () => MediatorServiceDescription.Create(typeof(TestPlainRequest));
-        act.Should().Throw<ArgumentException>();
+        Should.Throw<ArgumentException>(() => MediatorServiceDescription.Create(typeof(TestPlainRequest)));
     }
 
     [Fact]
     public void Create_引数の型にAsServiceが付加されていない場合例外が発行される()
     {
-        Action act = () => MediatorServiceDescription.Create(typeof(TestNotServicRequest));
-        act.Should().Throw<ArgumentException>();
+        Should.Throw<ArgumentException>(() => MediatorServiceDescription.Create(typeof(TestNotServicRequest)));
     }
 
     [Fact]
     public void Create_引数の型にIRequestを実装したクローズドでAsServiceが付加されている場合はMediatorRequestが返される()
     {
         var requests = MediatorServiceDescription.Create(typeof(TestServiceRequest));
-        requests.Should().HaveCount(1);
+        requests.Count().ShouldBe(1);
         var request = requests.First();
-        request.Path.Should().Be("/path");
-        request.ServiceType.Should().Be(typeof(TestServiceRequest));
+        request.Path.ShouldBe("/path");
+        request.ServiceType.ShouldBe(typeof(TestServiceRequest));
     }
 
     [Fact]
     public void Create_引数の型にIRequestTを実装したクローズドでAsServiceが付加されている場合はMediatorRequestが返される()
     {
         var requests = MediatorServiceDescription.Create(typeof(TestServiceRequestT));
-        requests.Should().HaveCount(1);
+        requests.Count().ShouldBe(1);
         var request = requests.First();
-        request.Path.Should().Be("/path");
-        request.ServiceType.Should().Be(typeof(TestServiceRequestT));
+        request.Path.ShouldBe("/path");
+        request.ServiceType.ShouldBe(typeof(TestServiceRequestT));
     }
 
     [Fact]
     public void Create_引数の型に複数のAsServiceが付加されている場合は複数のRequestが返される()
     {
         var requests = MediatorServiceDescription.Create(typeof(TestMultipleRouteRequest));
-        requests.Should().HaveCount(2);
+        requests.Count().ShouldBe(2);
         var requestList = requests.OrderBy(r => r.Path).ToList();
-        requestList[0].Path.Should().Be("/path1");
-        requestList[0].ServiceType.Should().Be(typeof(TestMultipleRouteRequest));
-        requestList[1].Path.Should().Be("/path2");
-        requestList[1].ServiceType.Should().Be(typeof(TestMultipleRouteRequest));
+        requestList[0].Path.ShouldBe("/path1");
+        requestList[0].ServiceType.ShouldBe(typeof(TestMultipleRouteRequest));
+        requestList[1].Path.ShouldBe("/path2");
+        requestList[1].ServiceType.ShouldBe(typeof(TestMultipleRouteRequest));
     }
 
     [AsService("/path")]

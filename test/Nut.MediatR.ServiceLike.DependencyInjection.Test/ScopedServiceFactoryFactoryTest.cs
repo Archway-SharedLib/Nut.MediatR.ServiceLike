@@ -1,5 +1,5 @@
 using System;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -10,8 +10,7 @@ public class ScopedServiceFactoryFactoryTest
     [Fact]
     public void ctor_パラメーターがnullの場合は例外が発生する()
     {
-        Action act = () => new ScopedServiceFactoryFactory(null!);
-        act.Should().Throw<ArgumentNullException>();
+        Should.Throw<ArgumentNullException>(() => new ScopedServiceFactoryFactory(null!));
     }
 
     [Fact]
@@ -20,6 +19,6 @@ public class ScopedServiceFactoryFactoryTest
         var services = new ServiceCollection();
         var provider = services.BuildServiceProvider();
         var factory = new ScopedServiceFactoryFactory(provider.GetService<IServiceScopeFactory>());
-        factory.Create().Should().NotBeNull();
+        factory.Create().ShouldNotBeNull();
     }
 }

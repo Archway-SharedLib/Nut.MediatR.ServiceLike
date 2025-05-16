@@ -1,5 +1,5 @@
 using System;
-using FluentAssertions;
+using Shouldly;
 using MediatR;
 using NSubstitute;
 using Xunit;
@@ -19,36 +19,31 @@ public class RequestContextTest
     [Fact]
     public void ctor_pathがnullの場合は例外が発生する()
     {
-        Action act = () => new RequestContext(null, typeof(ServicePing), CreateMockServiceProvider<object>(_ => null), typeof(Pong));
-        act.Should().Throw<ArgumentException>();
+        Should.Throw<ArgumentException>(() => new RequestContext(null, typeof(ServicePing), CreateMockServiceProvider<object>(_ => null), typeof(Pong)));
     }
 
     [Fact]
     public void ctor_pathが空文字の場合は例外が発生する()
     {
-        Action act = () => new RequestContext(string.Empty, typeof(ServicePing), CreateMockServiceProvider<object>(_ => null), typeof(Pong));
-        act.Should().Throw<ArgumentException>();
+        Should.Throw<ArgumentException>(() => new RequestContext(string.Empty, typeof(ServicePing), CreateMockServiceProvider<object>(_ => null), typeof(Pong)));
     }
 
     [Fact]
     public void ctor_pathが空白文字の場合は例外が発生する()
     {
-        Action act = () => new RequestContext(" ", typeof(ServicePing), CreateMockServiceProvider<object>(_ => null), typeof(Pong));
-        act.Should().Throw<ArgumentException>();
+        Should.Throw<ArgumentException>(() => new RequestContext(" ", typeof(ServicePing), CreateMockServiceProvider<object>(_ => null), typeof(Pong)));
     }
 
     [Fact]
     public void ctor_mediatorParameterTypeがnullの場合は例外が発生する()
     {
-        Action act = () => new RequestContext("/this/is/path", null, CreateMockServiceProvider<object>(_ => null), typeof(Pong));
-        act.Should().Throw<ArgumentException>();
+        Should.Throw<ArgumentException>(() => new RequestContext("/this/is/path", null, CreateMockServiceProvider<object>(_ => null), typeof(Pong)));
     }
 
     [Fact]
     public void ctor_serviceFactoryがnullの場合は例外が発生する()
     {
-        Action act = () => new RequestContext("/this/is/path", typeof(ServicePing), null, typeof(Pong));
-        act.Should().Throw<ArgumentException>();
+        Should.Throw<ArgumentException>(() => new RequestContext("/this/is/path", typeof(ServicePing), null, typeof(Pong)));
     }
 
     [Fact]
@@ -61,10 +56,10 @@ public class RequestContextTest
 
         var context = new RequestContext(path, mediatorParameterType, serviceFactory, clientResultType);
 
-        context.Path.Should().Be(path);
-        context.MediatorParameterType.Should().Be(mediatorParameterType);
-        context.ClientResultType.Should().Be(clientResultType);
-        context.ServiceProvider.Should().Be(serviceFactory);
+        context.Path.ShouldBe(path);
+        context.MediatorParameterType.ShouldBe(mediatorParameterType);
+        context.ClientResultType.ShouldBe(clientResultType);
+        context.ServiceProvider.ShouldBe(serviceFactory);
     }
 
     [Fact]
@@ -75,8 +70,8 @@ public class RequestContextTest
         var serviceFactory = CreateMockServiceProvider<object>(_ => null);
 
         var context = new RequestContext(path, mediatorParameterType, serviceFactory);
-        context.ClientResultType.Should().BeNull();
-        context.NeedClientResult.Should().BeFalse();
+        context.ClientResultType.ShouldBeNull();
+        context.NeedClientResult.ShouldBeFalse();
     }
 
     [Fact]
@@ -88,7 +83,7 @@ public class RequestContextTest
         var clientResultType = typeof(Pong);
 
         var context = new RequestContext(path, mediatorParameterType, serviceFactory, clientResultType);
-        context.ClientResultType.Should().Be(clientResultType);
-        context.NeedClientResult.Should().BeTrue();
+        context.ClientResultType.ShouldBe(clientResultType);
+        context.NeedClientResult.ShouldBeTrue();
     }
 }

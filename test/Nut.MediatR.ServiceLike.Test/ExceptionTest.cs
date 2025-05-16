@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace Nut.MediatR.ServiceLike.Test;
@@ -15,7 +15,7 @@ public class ExceptionTest
     public void MediatRServiceLikeException_ctor()
     {
         var exception = new MediatRServiceLikeException();
-        exception.Should().NotBeNull();
+        exception.ShouldNotBeNull();
     }
 
     [Fact]
@@ -23,7 +23,7 @@ public class ExceptionTest
     {
         var message = "testmessage";
         var exception = new MediatRServiceLikeException(message);
-        exception.Message.Should().Be(message);
+        exception.Message.ShouldBe(message);
     }
 
     [Fact]
@@ -31,7 +31,7 @@ public class ExceptionTest
     {
         var requestPath = "/path";
         var exception = new ReceiverNotFoundException(requestPath);
-        exception.RequestPath.Should().Be(requestPath);
+        exception.RequestPath.ShouldBe(requestPath);
     }
 
     [Fact]
@@ -39,7 +39,7 @@ public class ExceptionTest
     {
         var requestPath = "/path";
         var exception = new ReceiverNotFoundException(requestPath);
-        exception.Message.Should().NotBeNullOrEmpty();
+        exception.Message.ShouldNotBeNullOrEmpty();
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public class ExceptionTest
         var requestPath = "/path";
         var message = "testmessage";
         var exception = new ReceiverNotFoundException(requestPath, message);
-        exception.Message.Should().Be(message);
+        exception.Message.ShouldBe(message);
     }
 
     [Fact]
@@ -57,9 +57,9 @@ public class ExceptionTest
         var from = typeof(string);
         var to = typeof(int);
         var exception = new TypeTranslationException(from, to);
-        exception.FromType.Should().Be(from);
-        exception.ToType.Should().Be(to);
-        exception.Message.Should().NotBeNullOrEmpty();
+        exception.FromType.ShouldBe(from);
+        exception.ToType.ShouldBe(to);
+        exception.Message.ShouldNotBeNullOrEmpty();
     }
 
     [Fact]
@@ -69,9 +69,8 @@ public class ExceptionTest
         var to = typeof(int);
         var message = "testmessage";
         var exception = new TypeTranslationException(from, to, message);
-        exception.FromType.Should().Be(from);
-        exception.ToType.Should().Be(to);
-        exception.Message.Should().Be(message);
+        exception.FromType.ShouldBe(from);
+        exception.ToType.ShouldBe(to);
+        exception.Message.ShouldBe(message);
     }
-
 }

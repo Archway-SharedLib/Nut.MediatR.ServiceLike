@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace Nut.MediatR.ServiceLike.Test;
@@ -12,7 +12,7 @@ public class ServiceLikeContextAccessorTest
     public void ctor_インスタンスを作成した時点ではコンテキストはnull()
     {
         var accessor = new ServiceLikeContextAccessor();
-        accessor.Context.Should().BeNull();
+        accessor.Context.ShouldBeNull();
     }
 
     [Fact]
@@ -25,7 +25,7 @@ public class ServiceLikeContextAccessorTest
 
         await Task.Delay(100);
 
-        context.Should().BeSameAs(accessor.Context);
+        context.ShouldBeSameAs(accessor.Context);
     }
 
     [Fact]
@@ -41,14 +41,14 @@ public class ServiceLikeContextAccessorTest
 
         ThreadPool.QueueUserWorkItem(async _ =>
         {
-            context.Should().BeSameAs(accessor.Context);
+            context.ShouldBeSameAs(accessor.Context);
 
             checkAsyncFlowTcs.SetResult(null);
             await waitForNullTcs.Task;
 
             try
             {
-                accessor.Context.Should().BeNull();
+                accessor.Context.ShouldBeNull();
                 afterNullCheckTcs.SetResult(null);
             }
             catch (Exception ex)
@@ -62,7 +62,7 @@ public class ServiceLikeContextAccessorTest
 
         waitForNullTcs.SetResult(null);
 
-        accessor.Context.Should().BeNull();
+        accessor.Context.ShouldBeNull();
 
         await afterNullCheckTcs.Task;
     }
@@ -80,14 +80,14 @@ public class ServiceLikeContextAccessorTest
 
         ThreadPool.QueueUserWorkItem(async _ =>
         {
-            context.Should().BeSameAs(accessor.Context);
+            context.ShouldBeSameAs(accessor.Context);
             checkAsyncFlowTcs.SetResult(null);
 
             await waitForNullTcs.Task;
 
             try
             {
-                accessor.Context.Should().BeNull();
+                accessor.Context.ShouldBeNull();
                 afterNullCheckTcs.SetResult(null);
             }
             catch (Exception ex)
@@ -103,7 +103,7 @@ public class ServiceLikeContextAccessorTest
 
         waitForNullTcs.SetResult(null);
 
-        context2.Should().BeSameAs(accessor.Context);
+        context2.ShouldBeSameAs(accessor.Context);
 
         await afterNullCheckTcs.Task;
     }
@@ -121,7 +121,7 @@ public class ServiceLikeContextAccessorTest
         {
             try
             {
-                accessor.Context.Should().BeNull();
+                accessor.Context.ShouldBeNull();
                 checkAsyncFlowTcs.SetResult(null);
             }
             catch (Exception ex)

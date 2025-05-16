@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace Nut.MediatR.ServiceLike.Test;
@@ -13,8 +13,8 @@ public class ServiceRegistryTest
         var registry = new ServiceRegistry();
         registry.Add(typeof(ServicePing));
         var req = registry.GetService("/ping");
-        req.Should().NotBeNull();
-        registry.GetKeys().Should().HaveCount(1);
+        req.ShouldNotBeNull();
+        registry.GetKeys().Count().ShouldBe(1);
     }
 
     [Fact]
@@ -24,11 +24,11 @@ public class ServiceRegistryTest
         registry.Add(typeof(MultiServicePing));
 
         var req = registry.GetService("/ping/1");
-        req.Should().NotBeNull();
+        req.ShouldNotBeNull();
         var req2 = registry.GetService("/ping/2");
-        req2.Should().NotBeNull();
+        req2.ShouldNotBeNull();
 
-        registry.GetKeys().Should().HaveCount(2);
+        registry.GetKeys().Count().ShouldBe(2);
     }
 
     [Fact]
@@ -37,10 +37,8 @@ public class ServiceRegistryTest
         var registry = new ServiceRegistry();
         registry.Add(typeof(ServicePing));
 
-        Action act = () => registry.Add(typeof(ServicePing2));
-
-        act.Should().Throw<ArgumentException>();
-        registry.GetKeys().Should().HaveCount(1);
+        Should.Throw<ArgumentException>(() => registry.Add(typeof(ServicePing2)));
+        registry.GetKeys().Count().ShouldBe(1);
     }
 
     [Fact]
@@ -49,10 +47,8 @@ public class ServiceRegistryTest
         var registry = new ServiceRegistry();
         registry.Add(typeof(ServicePing));
 
-        Action act = () => registry.Add(typeof(ServicePing2), false);
-
-        act.Should().Throw<ArgumentException>();
-        registry.GetKeys().Should().HaveCount(1);
+        Should.Throw<ArgumentException>(() => registry.Add(typeof(ServicePing2), false));
+        registry.GetKeys().Count().ShouldBe(1);
     }
 
     [Fact]
@@ -63,26 +59,24 @@ public class ServiceRegistryTest
 
         registry.Add(typeof(ServicePing2), true);
 
-        registry.GetKeys().Should().HaveCount(1);
+        registry.GetKeys().Count().ShouldBe(1);
         var type = registry.GetService("/ping").ServiceType;
 
-        type.Should().Be(typeof(ServicePing));
+        type.ShouldBe(typeof(ServicePing));
     }
 
     [Fact]
     public void Add_typeがnullの場合は例外が発生する()
     {
         var registry = new ServiceRegistry();
-        var act = () => registry.Add(null);
-        act.Should().Throw<ArgumentNullException>();
+        Should.Throw<ArgumentNullException>(() => registry.Add(null));
     }
 
     [Fact]
     public void Add_typeがnullの場合は例外が発生する_withIgnoreDuplication()
     {
         var registry = new ServiceRegistry();
-        var act = () => registry.Add(null, true);
-        act.Should().Throw<ArgumentNullException>();
+        Should.Throw<ArgumentNullException>(() => registry.Add(null, true));
     }
 
     [Fact]
@@ -92,10 +86,10 @@ public class ServiceRegistryTest
         registry.Add(typeof(ServicePing), typeof(Filter1), typeof(Filter2));
 
         var request = registry.GetService("/ping");
-        request.Filters.Should().HaveCount(2);
+        request.Filters.Count().ShouldBe(2);
         var filters = request.Filters.ToList();
-        filters[0].Should().Be(typeof(Filter1));
-        filters[1].Should().Be(typeof(Filter2));
+        filters[0].ShouldBe(typeof(Filter1));
+        filters[1].ShouldBe(typeof(Filter2));
     }
 
     [Fact]
@@ -105,7 +99,7 @@ public class ServiceRegistryTest
         registry.Add(typeof(ServicePing));
 
         var request = registry.GetService("/ping");
-        request.Filters.Should().HaveCount(0);
+        request.Filters.Count().ShouldBe(0);
     }
 
     [Fact]
@@ -115,18 +109,18 @@ public class ServiceRegistryTest
         registry.Add(typeof(ServiceWithFilterPing), typeof(Filter2), typeof(Filter3));
 
         var request = registry.GetService("/ping");
-        request.Filters.Should().HaveCount(4);
+        request.Filters.Count().ShouldBe(4);
         var filters = request.Filters.ToList();
-        filters[0].Should().Be(typeof(Filter2));
-        filters[1].Should().Be(typeof(Filter3));
-        filters[2].Should().Be(typeof(Filter1));
-        filters[3].Should().Be(typeof(Filter4));
+        filters[0].ShouldBe(typeof(Filter2));
+        filters[1].ShouldBe(typeof(Filter3));
+        filters[2].ShouldBe(typeof(Filter1));
+        filters[3].ShouldBe(typeof(Filter4));
     }
 
     [Fact]
     public void GetRequest_設定されていないパスが指定された場合はnullが返る()
     {
         var registry = new ServiceRegistry();
-        registry.GetService("/unknown/path").Should().BeNull();
+        registry.GetService("/unknown/path").ShouldBeNull();
     }
 }

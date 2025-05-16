@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using FluentAssertions;
+using Shouldly;
 using Nut.MediatR.ServiceLike.Internals;
 using Xunit;
 
@@ -30,7 +30,7 @@ public class ServiceLikeLoggerWrapperTest
         new ServiceLikeLoggerWrapper(source).ErrorOnPublish(new Exception(),
             MediatorListenerDescription.Create(typeof(Pang)).First());
 
-        source.ErrorMessages.Should().BeEmpty();
+        source.ErrorMessages.ShouldBeEmpty();
     }
 
     [Fact]
@@ -41,7 +41,7 @@ public class ServiceLikeLoggerWrapperTest
         new ServiceLikeLoggerWrapper(source).ErrorOnPublish(new Exception(),
             MediatorListenerDescription.Create(typeof(Pang)).First());
 
-        source.ErrorMessages.Should().HaveCount(1);
+        source.ErrorMessages.Count.ShouldBe(1);
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public class ServiceLikeLoggerWrapperTest
         new ServiceLikeLoggerWrapper(source).TraceStartPublishToListeners("test",
             MediatorListenerDescription.Create(typeof(Pang)));
 
-        source.TraceMessages.Should().BeEmpty();
+        source.TraceMessages.ShouldBeEmpty();
     }
 
     [Fact]
@@ -70,7 +70,7 @@ public class ServiceLikeLoggerWrapperTest
         new ServiceLikeLoggerWrapper(source).TraceStartPublishToListeners("test",
             MediatorListenerDescription.Create(typeof(Pang)));
 
-        source.TraceMessages.Should().HaveCount(1);
+        source.TraceMessages.Count.ShouldBe(1);
     }
 
     [Fact]
@@ -86,7 +86,7 @@ public class ServiceLikeLoggerWrapperTest
         source.TraceEnabled = false;
         new ServiceLikeLoggerWrapper(source).TraceFinishPublishToListeners("test");
 
-        source.TraceMessages.Should().BeEmpty();
+        source.TraceMessages.ShouldBeEmpty();
     }
 
     [Fact]
@@ -96,7 +96,7 @@ public class ServiceLikeLoggerWrapperTest
         source.TraceEnabled = true;
         new ServiceLikeLoggerWrapper(source).TraceFinishPublishToListeners("test");
 
-        source.TraceMessages.Should().HaveCount(1);
+        source.TraceMessages.Count.ShouldBe(1);
     }
 
     [Fact]
@@ -114,7 +114,7 @@ public class ServiceLikeLoggerWrapperTest
         new ServiceLikeLoggerWrapper(source).TracePublishToListener(
             MediatorListenerDescription.Create(typeof(Pang)).First());
 
-        source.TraceMessages.Should().BeEmpty();
+        source.TraceMessages.ShouldBeEmpty();
     }
 
     [Fact]
@@ -125,7 +125,7 @@ public class ServiceLikeLoggerWrapperTest
         new ServiceLikeLoggerWrapper(source).TracePublishToListener(
             MediatorListenerDescription.Create(typeof(Pang)).First());
 
-        source.TraceMessages.Should().HaveCount(1);
+        source.TraceMessages.Count.ShouldBe(1);
     }
 
     [Fact]
@@ -141,7 +141,7 @@ public class ServiceLikeLoggerWrapperTest
         source.ErrorEnabled = false;
         new ServiceLikeLoggerWrapper(source).ErrorOnPublishEvents(new Exception(), "test");
 
-        source.ErrorMessages.Should().BeEmpty();
+        source.ErrorMessages.ShouldBeEmpty();
     }
 
     [Fact]
@@ -151,7 +151,7 @@ public class ServiceLikeLoggerWrapperTest
         source.ErrorEnabled = true;
         new ServiceLikeLoggerWrapper(source).ErrorOnPublishEvents(new Exception(), "test");
 
-        source.ErrorMessages.Should().HaveCount(1);
+        source.ErrorMessages.Count.ShouldBe(1);
     }
 
     [Fact]
@@ -167,7 +167,7 @@ public class ServiceLikeLoggerWrapperTest
         source.ErrorEnabled = false;
         new ServiceLikeLoggerWrapper(source).HandleException(new Exception());
 
-        source.ErrorMessages.Should().BeEmpty();
+        source.ErrorMessages.ShouldBeEmpty();
     }
 
     [Fact]
@@ -177,7 +177,7 @@ public class ServiceLikeLoggerWrapperTest
         source.ErrorEnabled = true;
         new ServiceLikeLoggerWrapper(source).HandleException(new Exception());
 
-        source.ErrorMessages.Should().HaveCount(1);
+        source.ErrorMessages.Count.ShouldBe(1);
     }
 
     private class TestServiceLikeLogger : IServiceLikeLogger

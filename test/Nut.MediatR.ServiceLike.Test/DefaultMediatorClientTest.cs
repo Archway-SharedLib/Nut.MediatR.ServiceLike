@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using FluentAssertions;
+using Shouldly;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
@@ -27,36 +27,32 @@ public class DefaultMediatorClientTest
     public void ctor_requestRegistryがnullの場合は例外が発生する()
     {
         var serviceFactory = CreateMockServiceProvider<object>(_ => null);
-        Action act = () => new DefaultMediatorClient(null, new ListenerRegistry(),
-            serviceFactory, new InternalScopedServiceFactoryFactory(serviceFactory), new TestLogger());
-        act.Should().Throw<ArgumentNullException>();
+        Should.Throw<ArgumentNullException>(() => new DefaultMediatorClient(null, new ListenerRegistry(),
+            serviceFactory, new InternalScopedServiceFactoryFactory(serviceFactory), new TestLogger()));
     }
 
     [Fact]
     public void ctor_notificationRegistryがnullの場合は例外が発生する()
     {
         var serviceFactory = CreateMockServiceProvider<object>(_ => null);
-        Action act = () => new DefaultMediatorClient(new ServiceRegistry(), null!,
-            serviceFactory, new InternalScopedServiceFactoryFactory(serviceFactory), new TestLogger());
-        act.Should().Throw<ArgumentNullException>();
+        Should.Throw<ArgumentNullException>(() => new DefaultMediatorClient(new ServiceRegistry(), null!,
+            serviceFactory, new InternalScopedServiceFactoryFactory(serviceFactory), new TestLogger()));
     }
 
     [Fact]
     public void ctor_serviceFactoryがnullの場合は例外が発生する()
     {
         var serviceFactory = CreateMockServiceProvider<object>(_ => null);
-        Action act = () => new DefaultMediatorClient(new ServiceRegistry(), new ListenerRegistry(),
-            null!, new InternalScopedServiceFactoryFactory(serviceFactory), new TestLogger());
-        act.Should().Throw<ArgumentNullException>();
+        Should.Throw<ArgumentNullException>(() => new DefaultMediatorClient(new ServiceRegistry(), new ListenerRegistry(),
+            null!, new InternalScopedServiceFactoryFactory(serviceFactory), new TestLogger()));
     }
 
     [Fact]
     public void ctor_ScopedServiceFactoryFactoryがnullの場合は例外が発生する()
     {
         var serviceFactory = CreateMockServiceProvider<object>(_ => null);
-        Action act = () => new DefaultMediatorClient(new ServiceRegistry(), new ListenerRegistry(),
-            serviceFactory, null!, new TestLogger());
-        act.Should().Throw<ArgumentNullException>();
+        Should.Throw<ArgumentNullException>(() => new DefaultMediatorClient(new ServiceRegistry(), new ListenerRegistry(),
+            serviceFactory, null!, new TestLogger()));
     }
 
     [Fact]
@@ -66,8 +62,7 @@ public class DefaultMediatorClientTest
         var client = new DefaultMediatorClient(new ServiceRegistry(), new ListenerRegistry(),
             serviceFactory, new InternalScopedServiceFactoryFactory(serviceFactory), new TestLogger());
 
-        Func<Task> act = () => client.SendAsync<Pong>("/path", null);
-        await act.Should().ThrowAsync<ArgumentNullException>();
+        await Should.ThrowAsync<ArgumentNullException>(() => client.SendAsync<Pong>("/path", null));
     }
 
     [Fact]
@@ -77,9 +72,8 @@ public class DefaultMediatorClientTest
         var client = new DefaultMediatorClient(new ServiceRegistry(), new ListenerRegistry(),
             serviceFactory, new InternalScopedServiceFactoryFactory(serviceFactory), new TestLogger());
 
-        var act = () => client.SendAsync<Pong>("/path", new ServicePing());
-        var res = await act.Should().ThrowAsync<ReceiverNotFoundException>();
-        res.And.RequestPath.Should().Be("/path");
+        var ex = await Should.ThrowAsync<ReceiverNotFoundException>(() => client.SendAsync<Pong>("/path", new ServicePing()));
+        ex.RequestPath.ShouldBe("/path");
     }
 
     [Fact]
@@ -98,8 +92,8 @@ public class DefaultMediatorClientTest
             provider, new TestScopedServiceFactoryFactory(provider), new TestLogger());
 
         var pong = await client.SendAsync<Pong>("/ping", new ServicePing() { Value = "Ping" });
-        pong!.Value.Should().Be("Ping Pong");
-        check.Executed.Should().BeTrue();
+        pong!.Value.ShouldBe("Ping Pong");
+        check.Executed.ShouldBeTrue();
     }
 
     [Fact]
@@ -118,7 +112,7 @@ public class DefaultMediatorClientTest
             provider, new TestScopedServiceFactoryFactory(provider), new TestLogger());
 
         await client.SendAsync("/ping", new ServicePing() { Value = "Ping" });
-        check.Executed.Should().BeTrue();
+        check.Executed.ShouldBeTrue();
     }
 
     [Fact]
@@ -137,8 +131,8 @@ public class DefaultMediatorClientTest
             provider, new TestScopedServiceFactoryFactory(provider), new TestLogger());
 
         var pong = await client.SendAsync<LocalPong>("/ping", new { Value = "Ping" });
-        pong!.Value.Should().Be("Ping Pong");
-        check.Executed.Should().BeTrue();
+        pong!.Value.ShouldBe("Ping Pong");
+        check.Executed.ShouldBeTrue();
     }
 
     [Fact]
@@ -156,10 +150,9 @@ public class DefaultMediatorClientTest
         var client = new DefaultMediatorClient(registry, new ListenerRegistry(),
             provider, new TestScopedServiceFactoryFactory(provider), new TestLogger());
 
-        var act = () => client.SendAsync<Pong>("/ping", "ping");
-        var res = await act.Should().ThrowAsync<TypeTranslationException>();
-        res.And.FromType.Should().Be(typeof(string));
-        res.And.ToType.Should().Be(typeof(ServicePing));
+        var ex = await Should.ThrowAsync<TypeTranslationException>(() => client.SendAsync<Pong>("/ping", "ping"));
+        ex.FromType.ShouldBe(typeof(string));
+        ex.ToType.ShouldBe(typeof(ServicePing));
     }
 
     [Fact]
@@ -177,10 +170,9 @@ public class DefaultMediatorClientTest
         var client = new DefaultMediatorClient(registry, new ListenerRegistry(),
             provider, new TestScopedServiceFactoryFactory(provider), new TestLogger());
 
-        var act = () => client.SendAsync<string>("/ping", new { Value = "Ping" });
-        var res = await act.Should().ThrowAsync<TypeTranslationException>();
-        res.And.FromType.Should().Be(typeof(Pong));
-        res.And.ToType.Should().Be(typeof(string));
+        var ex = await Should.ThrowAsync<TypeTranslationException>(() => client.SendAsync<string>("/ping", new { Value = "Ping" }));
+        ex.FromType.ShouldBe(typeof(Pong));
+        ex.ToType.ShouldBe(typeof(string));
     }
 
     [Fact]
@@ -199,8 +191,8 @@ public class DefaultMediatorClientTest
             provider, new TestScopedServiceFactoryFactory(provider), new TestLogger());
 
         var pong = await client.SendAsync<Pong>("/ping/null", new { Value = "Ping" });
-        pong.Should().BeNull();
-        check.Executed.Should().BeTrue();
+        pong.ShouldBeNull();
+        check.Executed.ShouldBeTrue();
     }
 
     [Fact]
@@ -219,7 +211,7 @@ public class DefaultMediatorClientTest
             provider, new TestScopedServiceFactoryFactory(provider), new TestLogger());
 
         await client.SendAsync("/ping/null", new { Value = "Ping" });
-        check.Executed.Should().BeTrue();
+        check.Executed.ShouldBeTrue();
     }
 
     [Fact]
@@ -238,8 +230,8 @@ public class DefaultMediatorClientTest
             provider, new TestScopedServiceFactoryFactory(provider), new TestLogger());
 
         var pong = await client.SendAsync<Pong>("/ping/void", new { Value = "Ping" });
-        pong.Should().BeNull();
-        check.Executed.Should().BeTrue();
+        pong.ShouldBeNull();
+        check.Executed.ShouldBeTrue();
     }
 
     [Fact]
@@ -258,7 +250,7 @@ public class DefaultMediatorClientTest
             provider, new TestScopedServiceFactoryFactory(provider), new TestLogger());
 
         await client.SendAsync("/ping/void", new { Value = "Ping" });
-        check.Executed.Should().BeTrue();
+        check.Executed.ShouldBeTrue();
     }
 
     [Fact]
@@ -283,10 +275,10 @@ public class DefaultMediatorClientTest
 
         var pong = await client.SendAsync<Pong>("/ping", new ServicePing() { Value = "Ping" });
 
-        pong!.Value.Should().Be("Ping Pong");
-        check.Checks.Should().HaveCount(2);
-        check.Checks[0].Should().Be("1");
-        check.Checks[1].Should().Be("2");
+        pong!.Value.ShouldBe("Ping Pong");
+        check.Checks.Count.ShouldBe(2);
+        check.Checks[0].ShouldBe("1");
+        check.Checks[1].ShouldBe("2");
     }
 
     [Fact]
@@ -296,8 +288,7 @@ public class DefaultMediatorClientTest
         var client = new DefaultMediatorClient(new ServiceRegistry(), new ListenerRegistry(),
             serviceFactory, new InternalScopedServiceFactoryFactory(serviceFactory!), new TestLogger());
 
-        var act = () => client.PublishAsync("ev", new Pang(), (Action<PublishOptions>)null!);
-        await act.Should().ThrowAsync<ArgumentNullException>();
+        await Should.ThrowAsync<ArgumentNullException>(() => client.PublishAsync("ev", new Pang(), (Action<PublishOptions>)null!));
     }
 
     [Fact]
@@ -307,8 +298,7 @@ public class DefaultMediatorClientTest
         var client = new DefaultMediatorClient(new ServiceRegistry(), new ListenerRegistry(),
             serviceFactory, new InternalScopedServiceFactoryFactory(serviceFactory!), new TestLogger());
 
-        Func<Task> act = () => client.PublishAsync("ev", null!);
-        await act.Should().ThrowAsync<ArgumentNullException>();
+        await Should.ThrowAsync<ArgumentNullException>(() => client.PublishAsync("ev", null!));
     }
 
     [Fact]
@@ -346,13 +336,16 @@ public class DefaultMediatorClientTest
         await Task.Delay(1000); //それぞれで10だけまたしているため、1000あれば終わっているはず。
 
         await Task.WhenAll(holder.Tasks);
-        holder.Messages.Should().HaveCount(3).And.Contain("1", "2", "3");
-        holder.Pangs.Should().HaveCount(3);
+        holder.Messages.Count.ShouldBe(3);
+        holder.Messages.ShouldContain("1");
+        holder.Messages.ShouldContain("2");
+        holder.Messages.ShouldContain("3");
+        holder.Pangs.Count.ShouldBe(3);
 
         var paramBang = holder.Pangs[0];
         foreach (var bangItem in holder.Pangs)
         {
-            paramBang.Should().Be(bangItem);
+            paramBang.ShouldBe(bangItem);
         }
     }
 
@@ -379,13 +372,16 @@ public class DefaultMediatorClientTest
         await Task.Delay(1000); //それぞれで10だけまたしているため、1000あれば終わっているはず。
 
         await Task.WhenAll(holder.Tasks);
-        holder.Messages.Should().HaveCount(3).And.Contain("1", "2", "3");
-        holder.Pangs.Should().HaveCount(3);
+        holder.Messages.Count.ShouldBe(3);
+        holder.Messages.ShouldContain("1");
+        holder.Messages.ShouldContain("2");
+        holder.Messages.ShouldContain("3");
+        holder.Pangs.Count.ShouldBe(3);
 
         var paramBang = holder.Pangs[0];
         foreach (var bangItem in holder.Pangs)
         {
-            paramBang.Should().Be(bangItem);
+            paramBang.ShouldBe(bangItem);
         }
     }
 
@@ -408,7 +404,7 @@ public class DefaultMediatorClientTest
         // Fire and forgetのため一旦スリープ
         await Task.Delay(2000);
 
-        logger.Errors.Should().HaveCount(1);
+        logger.Errors.Count.ShouldBe(1);
     }
 
     [Fact]
@@ -434,10 +430,10 @@ public class DefaultMediatorClientTest
         // Fire and forgetのため一旦スリープ
         await Task.Delay(1000);
 
-        holder.Messages.Should().HaveCount(3);
-        holder.Messages.Contains("request").Should().BeTrue();
-        holder.Messages.Contains("notification").Should().BeTrue();
-        holder.Messages.Contains("notification2").Should().BeTrue();
+        holder.Messages.Count.ShouldBe(3);
+        holder.Messages.ShouldContain("request");
+        holder.Messages.ShouldContain("notification");
+        holder.Messages.ShouldContain("notification2");
     }
 
     [Fact()]
@@ -465,8 +461,8 @@ public class DefaultMediatorClientTest
         // Fire and forgetのため一旦スリープ
         await Task.Delay(1000);
 
-        holder.Messages.Should().HaveCount(0);
-        testLogger.Errors.Should().HaveCount(2);
+        holder.Messages.Count.ShouldBe(0);
+        testLogger.Errors.Count.ShouldBe(2);
     }
 
     [Fact()]
@@ -492,11 +488,11 @@ public class DefaultMediatorClientTest
         // Fire and forgetのため一旦スリープ
         await Task.Delay(1000);
 
-        holder.ScopeIds.Should().HaveCount(3);
-        holder.ScopeIds[typeof(MixedRequestHandler)].Should().NotBe(holder.ScopeIds[typeof(MixedNotificationHandler)]);
-        holder.ScopeIds[typeof(MixedNotificationHandler)].Should().Be(holder.ScopeIds[typeof(MixedNotificationHandler2)]);
+        holder.ScopeIds.Count.ShouldBe(3);
+        holder.ScopeIds[typeof(MixedRequestHandler)].ShouldNotBe(holder.ScopeIds[typeof(MixedNotificationHandler)]);
+        holder.ScopeIds[typeof(MixedNotificationHandler)].ShouldBe(holder.ScopeIds[typeof(MixedNotificationHandler2)]);
 
-        holder.ScopeIdProviders.All(p => p.Disposed).Should().BeTrue();
+        holder.ScopeIdProviders.All(p => p.Disposed).ShouldBeTrue();
     }
 
     private class ExceptionTestScopedServiceFactoryFactory : IScopedServiceFactoryFactory

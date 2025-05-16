@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace Nut.MediatR.ServiceLike.Test;
@@ -10,8 +10,7 @@ public class FilterSupportTest
     [Fact]
     public void IsValidTIlterTypeAllCore_fileterTypesがnullの場合は例外が発生する()
     {
-        Action act = () => FilterSupport.IsValidFilterTypeAllCore(null);
-        act.Should().Throw<ArgumentNullException>();
+        Should.Throw<ArgumentNullException>(() => FilterSupport.IsValidFilterTypeAllCore(null));
     }
 
     [Fact]
@@ -19,7 +18,7 @@ public class FilterSupportTest
     {
         var result = FilterSupport.IsValidFilterTypeAllCore(
             new Type[] { typeof(Filter1), null, typeof(Filter2) });
-        result.Should().BeFalse();
+        result.ShouldBeFalse();
     }
 
     [Fact]
@@ -27,7 +26,7 @@ public class FilterSupportTest
     {
         var result = FilterSupport.IsValidFilterTypeAllCore(
             new Type[] { typeof(Filter1), typeof(string), typeof(Filter2) });
-        result.Should().BeFalse();
+        result.ShouldBeFalse();
     }
 
     [Fact]
@@ -35,7 +34,7 @@ public class FilterSupportTest
     {
         var result = FilterSupport.IsValidFilterTypeAllCore(
             new Type[] { typeof(Filter1), typeof(Filter3), typeof(Filter2) });
-        result.Should().BeFalse();
+        result.ShouldBeFalse();
     }
 
     [Fact]
@@ -43,38 +42,34 @@ public class FilterSupportTest
     {
         var result = FilterSupport.IsValidFilterTypeAllCore(
             new Type[] { typeof(Filter1), typeof(Filter2) });
-        result.Should().BeTrue();
+        result.ShouldBeTrue();
     }
 
     [Fact]
     public void ThrowIfInvalidFileterTypeAllWith_fileterTypesがnullの場合は例外が発生する()
     {
-        Action act = () => FilterSupport.ThrowIfInvalidFilterTypeAllWith(null);
-        act.Should().Throw<ArgumentNullException>();
+        Should.Throw<ArgumentNullException>(() => FilterSupport.ThrowIfInvalidFilterTypeAllWith(null));
     }
 
     [Fact]
     public void ThrowIfInvalidFileterTypeAllWith_fileterTypesにnullが含まれる場合はfalseが返る()
     {
-        Action act = () => FilterSupport.ThrowIfInvalidFilterTypeAllWith(
-            new Type[] { typeof(Filter1), null, typeof(Filter2) });
-        act.Should().Throw<ArgumentException>();
+        Should.Throw<ArgumentException>(() => FilterSupport.ThrowIfInvalidFilterTypeAllWith(
+            new Type[] { typeof(Filter1), null, typeof(Filter2) }));
     }
 
     [Fact]
     public void ThrowIfInvalidFileterTypeAllWith_fileterTypesにIFilterを継承していない型が含まれる場合はfalseが返る()
     {
-        Action act = () => FilterSupport.ThrowIfInvalidFilterTypeAllWith(
-            new Type[] { typeof(Filter1), typeof(string), typeof(Filter2) });
-        act.Should().Throw<ArgumentException>();
+        Should.Throw<ArgumentException>(() => FilterSupport.ThrowIfInvalidFilterTypeAllWith(
+            new Type[] { typeof(Filter1), typeof(string), typeof(Filter2) }));
     }
 
     [Fact]
     public void ThrowIfInvalidFileterTypeAllWith_fileterTypesにデフォルトコンストラクターがない型が含まれる場合はfalseが返る()
     {
-        Action act = () => FilterSupport.ThrowIfInvalidFilterTypeAllWith(
-                new Type[] { typeof(Filter1), typeof(Filter3), typeof(Filter2) });
-        act.Should().Throw<ArgumentException>();
+        Should.Throw<ArgumentException>(() => FilterSupport.ThrowIfInvalidFilterTypeAllWith(
+                new Type[] { typeof(Filter1), typeof(Filter3), typeof(Filter2) }));
     }
 
     [Fact]

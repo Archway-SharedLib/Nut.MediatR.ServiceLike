@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace Nut.MediatR.ServiceLike.Test;
@@ -11,23 +11,23 @@ public class ServiceLikeContextTest
     [Fact]
     public void ctor_keyにnullまたは空文字または空白が指定された場合は例外が発生する()
     {
-        ((Action)(() => new ServiceLikeContext(null))).Should().Throw<ArgumentException>();
-        ((Action)(() => new ServiceLikeContext(""))).Should().Throw<ArgumentException>();
-        ((Action)(() => new ServiceLikeContext("  "))).Should().Throw<ArgumentException>();
+        Should.Throw<ArgumentException>(() => new ServiceLikeContext(null));
+        Should.Throw<ArgumentException>(() => new ServiceLikeContext(""));
+        Should.Throw<ArgumentException>(() => new ServiceLikeContext("  "));
     }
 
     [Fact]
     public void ctor_Headerにnullを設定してもからのHeaderがプロパティから取得できる()
     {
         var instance = new ServiceLikeContext("key", null);
-        instance.Header.Count().Should().Be(0);
+        instance.Header.Count().ShouldBe(0);
     }
 
     [Fact]
     public void Id_IdにはGuidベースの値が設定される()
     {
         var instance = new ServiceLikeContext("key");
-        Guid.TryParseExact(instance.Id, "N", out var _).Should().BeTrue();
+        Guid.TryParseExact(instance.Id, "N", out var _).ShouldBeTrue();
     }
 
     [Fact]
@@ -40,9 +40,9 @@ public class ServiceLikeContextTest
             };
         var instance = new ServiceLikeContext("key", header);
 
-        instance.Header.Count().Should().Be(header.Count());
-        instance.Header["key1"].Should().Be(header["key1"]);
-        instance.Header["key2"].Should().Be(header["key2"]);
+        instance.Header.Count().ShouldBe(header.Count());
+        instance.Header["key1"].ShouldBe(header["key1"]);
+        instance.Header["key2"].ShouldBe(header["key2"]);
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public class ServiceLikeContextTest
     {
         var expect = "alksjfolawjef";
         var instance = new ServiceLikeContext(expect);
-        instance.Key.Should().Be(expect);
+        instance.Key.ShouldBe(expect);
     }
 
     [Fact]
@@ -58,6 +58,6 @@ public class ServiceLikeContextTest
     {
         var now = DateTimeOffset.Now.Ticks;
         var instance = new ServiceLikeContext("foo");
-        instance.Timestamp.Should().BeInRange(now - 30000, now + 30000);
+        instance.Timestamp.ShouldBeInRange(now - 30000, now + 30000);
     }
 }

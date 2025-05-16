@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace Nut.MediatR.ServiceLike.Test;
@@ -11,101 +11,101 @@ public class TypeExtensionsTest
 {
     [Fact]
     public void IsOpenGeneric_型パラメータが省略されている型はtrueになる()
-        => TypeExtensions.IsOpenGeneric(typeof(List<>)).Should().BeTrue();
+        => TypeExtensions.IsOpenGeneric(typeof(List<>)).ShouldBeTrue();
 
     [Fact]
     public void IsOpenGeneric_型パラメータが省略されている型を持っているGeneric型もtrueになる()
-        => TypeExtensions.IsOpenGeneric(typeof(List<>).MakeGenericType(typeof(List<>))).Should().BeTrue();
+        => TypeExtensions.IsOpenGeneric(typeof(List<>).MakeGenericType(typeof(List<>))).ShouldBeTrue();
 
     [Fact]
     public void IsOpenGeneric_型パラメータが埋まっている場合はfalseになる()
-        => TypeExtensions.IsOpenGeneric(typeof(List<>).MakeGenericType(typeof(List<string>))).Should().BeFalse();
+        => TypeExtensions.IsOpenGeneric(typeof(List<>).MakeGenericType(typeof(List<string>))).ShouldBeFalse();
 
     [Fact]
     public void IsOpenGeneric_型パラメータがない場合はfalseになる()
-        => TypeExtensions.IsOpenGeneric(typeof(TypeExtensionsTest)).Should().BeFalse();
+        => TypeExtensions.IsOpenGeneric(typeof(TypeExtensionsTest)).ShouldBeFalse();
 
     [Fact]
     public void IsConcrete_abstractクラスはfalseになる()
-        => TypeExtensions.IsConcrete(typeof(IsConcreteAbstract)).Should().BeFalse();
+        => TypeExtensions.IsConcrete(typeof(IsConcreteAbstract)).ShouldBeFalse();
 
     [Fact]
     public void IsConcrete_interfaceはfalseになる()
-        => TypeExtensions.IsConcrete(typeof(IsConcreteInterface)).Should().BeFalse();
+        => TypeExtensions.IsConcrete(typeof(IsConcreteInterface)).ShouldBeFalse();
 
     [Fact]
     public void IsConcrete_実装クラスはtrueになる()
-        => TypeExtensions.IsConcrete(typeof(TypeExtensionsTest)).Should().BeTrue();
+        => TypeExtensions.IsConcrete(typeof(TypeExtensionsTest)).ShouldBeTrue();
 
     [Fact]
     public void GetAttribute_属性が取得できる()
-        => TypeExtensions.GetAttribute<GetAttrAttribute>(typeof(GetAttrDefualt)).Should().BeOfType<GetAttrAttribute>();
+        => TypeExtensions.GetAttribute<GetAttrAttribute>(typeof(GetAttrDefualt)).ShouldBeOfType<GetAttrAttribute>();
 
     [Fact]
     public void GetAttribute_属性が設定されていないときはnullが返る()
-        => TypeExtensions.GetAttribute<GetAttrAttribute>(typeof(GetAttrNull)).Should().BeNull();
+        => TypeExtensions.GetAttribute<GetAttrAttribute>(typeof(GetAttrNull)).ShouldBeNull();
 
     [Fact]
     public void GetAttribute_複数の属性が設定されているときはいずれかの値が取得できる()
-        => TypeExtensions.GetAttribute<GetAttrAttribute>(typeof(GetAttrMulti)).Value.Should().MatchRegex("^[12]$");
+        => TypeExtensions.GetAttribute<GetAttrAttribute>(typeof(GetAttrMulti)).Value.ShouldMatch("^[12]$");
 
     [Fact]
     public void GetAttribute_継承元の場合も取得する()
-        => TypeExtensions.GetAttribute<GetAttrAttribute>(typeof(GetAttrInherit)).Should().BeOfType<GetAttrAttribute>();
+        => TypeExtensions.GetAttribute<GetAttrAttribute>(typeof(GetAttrInherit)).ShouldBeOfType<GetAttrAttribute>();
 
     [Fact]
     public void GetAttribute_inheritにfalseを設定すると継承元の場合は取得しない()
-        => TypeExtensions.GetAttribute<GetAttrAttribute>(typeof(GetAttrInherit), false).Should().BeNull();
+        => TypeExtensions.GetAttribute<GetAttrAttribute>(typeof(GetAttrInherit), false).ShouldBeNull();
 
     [Fact]
     public void GetAttribute_inheritにtrueを設定すると継承元の場合は取得する()
-        => TypeExtensions.GetAttribute<GetAttrAttribute>(typeof(GetAttrInherit), true).Should().BeOfType<GetAttrAttribute>();
+        => TypeExtensions.GetAttribute<GetAttrAttribute>(typeof(GetAttrInherit), true).ShouldBeOfType<GetAttrAttribute>();
 
     [Fact]
     public void GetAttributes_すべての属性が取得できる()
     {
         var attrs = TypeExtensions.GetAttributes<GetAttrAttribute>(typeof(GetAttrMulti));
-        attrs.Should().HaveCount(2);
+        attrs.Count().ShouldBe(2);
         var attrList = attrs.OrderBy(a => a.Value).ToList();
-        attrList[0].Value.Should().Be("1");
-        attrList[1].Value.Should().Be("2");
+        attrList[0].Value.ShouldBe("1");
+        attrList[1].Value.ShouldBe("2");
     }
 
     [Fact]
     public void GetAttributes_属性が設定されていない場合は空になる()
-        => TypeExtensions.GetAttributes<GetAttrAttribute>(typeof(GetAttrNull)).Should().BeEmpty();
+        => TypeExtensions.GetAttributes<GetAttrAttribute>(typeof(GetAttrNull)).ShouldBeEmpty();
 
     [Fact]
     public void GetAttributes_継承元の場合も取得する()
     {
         var attrs = TypeExtensions.GetAttributes<GetAttrAttribute>(typeof(GetAttrInheritMulti));
-        attrs.Should().HaveCount(2);
+        attrs.Count().ShouldBe(2);
         var attrList = attrs.OrderBy(a => a.Value).ToList();
-        attrList[0].Value.Should().Be("1");
-        attrList[1].Value.Should().Be("2");
+        attrList[0].Value.ShouldBe("1");
+        attrList[1].Value.ShouldBe("2");
     }
 
     [Fact]
     public void GetAttributes_inheritにfalseを設定すると継承元の場合は取得しない()
-        => TypeExtensions.GetAttributes<GetAttrAttribute>(typeof(GetAttrInheritMulti), false).Should().BeEmpty();
+        => TypeExtensions.GetAttributes<GetAttrAttribute>(typeof(GetAttrInheritMulti), false).ShouldBeEmpty();
 
     [Fact]
     public void GetAttributes_inheritにtrueを設定すると継承元の場合は取得する()
     {
         var attrs = TypeExtensions.GetAttributes<GetAttrAttribute>(typeof(GetAttrInheritMulti), true);
-        attrs.Should().HaveCount(2);
+        attrs.Count().ShouldBe(2);
         var attrList = attrs.OrderBy(a => a.Value).ToList();
-        attrList[0].Value.Should().Be("1");
-        attrList[1].Value.Should().Be("2");
+        attrList[0].Value.ShouldBe("1");
+        attrList[1].Value.ShouldBe("2");
     }
 
     [Fact]
     public void IsImplemented_interfaceTypeパラメーターがインターフェイスではない場合はfalse()
-        => TypeExtensions.IsImplemented(typeof(GetAttrInherit), typeof(GetAttrDefualt)).Should().BeFalse();
+        => TypeExtensions.IsImplemented(typeof(GetAttrInherit), typeof(GetAttrDefualt)).ShouldBeFalse();
 
     [Fact]
     public void IsImplemented_typeパラメーターがインターフェイスの場合はfalse()
-        => TypeExtensions.IsImplemented(typeof(IsConcreteInterfaceInherit), typeof(IsConcreteInterface)).Should().BeFalse();
+        => TypeExtensions.IsImplemented(typeof(IsConcreteInterfaceInherit), typeof(IsConcreteInterface)).ShouldBeFalse();
 
     [Theory()]
     [InlineData(typeof(GenericInterfaceImpl<>), typeof(GenericInterface<>))]
@@ -121,7 +121,7 @@ public class TypeExtensionsTest
     [InlineData(typeof(NestedGenericInterfaceImpl<>), typeof(GenericInterface<>))]
     [InlineData(typeof(NestedGenericInterfaceImpl<string>), typeof(GenericInterface<string>))]
     public void IsImplementd_インターフェイスを継承している場合はtrue(Type type, Type interfaceType)
-        => TypeExtensions.IsImplemented(type, interfaceType).Should().BeTrue();
+        => TypeExtensions.IsImplemented(type, interfaceType).ShouldBeTrue();
 
     [Theory()]
     [InlineData(typeof(NonGenericInterfaceImpl), typeof(GenericInterface<>))]
@@ -129,27 +129,27 @@ public class TypeExtensionsTest
     [InlineData(typeof(GenericInterfaceTypedImpl), typeof(GenericInterface<bool>))]
     [InlineData(typeof(GenericInterfaceTypedImpl), typeof(NonGenericInterface))]
     public void IsImplementd_インターフェイスを継承してない場合はtrue(Type type, Type interfaceType)
-        => TypeExtensions.IsImplemented(type, interfaceType).Should().BeFalse();
+        => TypeExtensions.IsImplemented(type, interfaceType).ShouldBeFalse();
 
     [Fact]
     public void Activate_インスタンスを作成できる()
-        => TypeExtensions.Activate<ActivateInterface>(typeof(ActivateClass)).Should().NotBeNull();
+        => TypeExtensions.Activate<ActivateInterface>(typeof(ActivateClass)).ShouldNotBeNull();
 
     [Fact]
     public void HasDefaultConstructor_デフォルトコンストラクタがある場合はtrueが返る()
-        => TypeExtensions.HasDefaultConstructor(typeof(ActivateClass)).Should().BeTrue();
+        => TypeExtensions.HasDefaultConstructor(typeof(ActivateClass)).ShouldBeTrue();
 
     [Fact]
     public void HasDefaultConstructor_デフォルトコンストラクタがない場合はfalseが返る()
-        => TypeExtensions.HasDefaultConstructor(typeof(ActivateClass2)).Should().BeFalse();
+        => TypeExtensions.HasDefaultConstructor(typeof(ActivateClass2)).ShouldBeFalse();
 
     [Fact]
     public void GetDefaultConstructor_デフォルトコンストラクタがある場合はConstructorInfoが返る()
-        => TypeExtensions.GetDefaultConstructor(typeof(ActivateClass)).Should().BeAssignableTo<ConstructorInfo>();
+        => TypeExtensions.GetDefaultConstructor(typeof(ActivateClass)).ShouldBeAssignableTo<ConstructorInfo>();
 
     [Fact]
     public void GetDefaultConstructor_デフォルトコンストラクタがない場合はnullが返る()
-        => TypeExtensions.GetDefaultConstructor(typeof(ActivateClass2)).Should().BeNull();
+        => TypeExtensions.GetDefaultConstructor(typeof(ActivateClass2)).ShouldBeNull();
 
     //-----------------------------
 

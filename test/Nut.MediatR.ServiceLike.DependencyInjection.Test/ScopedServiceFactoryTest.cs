@@ -1,5 +1,5 @@
 using System;
-using FluentAssertions;
+using Shouldly;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -11,8 +11,7 @@ public class ScopedServiceFactoryTest
     [Fact]
     public void ctor_パラメーターがない場合は例外が発生する()
     {
-        Action act = () => new ScopedServiceFactory(null!);
-        act.Should().Throw<ArgumentNullException>();
+        Should.Throw<ArgumentNullException>(() => new ScopedServiceFactory(null!));
     }
 
     [Fact]
@@ -25,7 +24,7 @@ public class ScopedServiceFactoryTest
         var outerTest1 = outerScope.ServiceProvider.GetService<Test>();
         var outerTest2 = outerScope.ServiceProvider.GetService<Test>();
 
-        outerTest1.Should().Be(outerTest2);
+        outerTest1.ShouldBe(outerTest2);
 
         Test innerTest1 = null;
         Test innerTest2 = null;
@@ -35,14 +34,14 @@ public class ScopedServiceFactoryTest
             innerTest1 = scope.Instance.GetService<Test>();
             innerTest2 = scope.Instance.GetService<Test>();
 
-            innerTest1.Should().Be(innerTest2);
-            innerTest1.Should().NotBe(outerTest1);
-            innerTest1.Disposed.Should().BeFalse();
-            innerTest1.Disposed.Should().BeFalse();
+            innerTest1.ShouldBe(innerTest2);
+            innerTest1.ShouldNotBe(outerTest1);
+            innerTest1.Disposed.ShouldBeFalse();
+            innerTest2.Disposed.ShouldBeFalse();
         }
 
-        innerTest1.Disposed.Should().BeTrue();
-        innerTest2.Disposed.Should().BeTrue();
+        innerTest1.Disposed.ShouldBeTrue();
+        innerTest2.Disposed.ShouldBeTrue();
     }
 
     private class Test : IDisposable

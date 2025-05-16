@@ -8,13 +8,13 @@ namespace Nut.MediatR.ServiceLike.Test;
 public class FilterSupportTest
 {
     [Fact]
-    public void IsValidTIlterTypeAllCore_fileterTypesがnullの場合は例外が発生する()
+    public void IsValidFilterTypeAllCore_filterTypesがnullの場合は例外が発生する()
     {
         Should.Throw<ArgumentNullException>(() => FilterSupport.IsValidFilterTypeAllCore(null));
     }
 
     [Fact]
-    public void IsValidTIlterTypeAllCore_fileterTypesにnullが含まれる場合はfalseが返る()
+    public void IsValidFilterTypeAllCore_filterTypesにnullが含まれる場合はfalseが返る()
     {
         var result = FilterSupport.IsValidFilterTypeAllCore(
             new Type[] { typeof(Filter1), null, typeof(Filter2) });
@@ -22,7 +22,7 @@ public class FilterSupportTest
     }
 
     [Fact]
-    public void IsValidTIlterTypeAllCore_fileterTypesにIFilterを継承していない型が含まれる場合はfalseが返る()
+    public void IsValidFilterTypeAllCore_filterTypesにIFilterを継承していない型が含まれる場合はfalseが返る()
     {
         var result = FilterSupport.IsValidFilterTypeAllCore(
             new Type[] { typeof(Filter1), typeof(string), typeof(Filter2) });
@@ -30,7 +30,7 @@ public class FilterSupportTest
     }
 
     [Fact]
-    public void IsValidTIlterTypeAllCore_fileterTypesにデフォルトコンストラクターがない型が含まれる場合はfalseが返る()
+    public void IsValidFilterTypeAllCore_filterTypesにデフォルトコンストラクターがない型が含まれる場合はfalseが返る()
     {
         var result = FilterSupport.IsValidFilterTypeAllCore(
             new Type[] { typeof(Filter1), typeof(Filter3), typeof(Filter2) });
@@ -38,7 +38,7 @@ public class FilterSupportTest
     }
 
     [Fact]
-    public void IsValidTIlterTypeAllCore_fileterTypesが全てIFilterを継承してデフォルトコンストラクターがある型の場合はtrueが返る()
+    public void IsValidFilterTypeAllCore_filterTypesが全てIFilterを継承してデフォルトコンストラクターがある型の場合はtrueが返る()
     {
         var result = FilterSupport.IsValidFilterTypeAllCore(
             new Type[] { typeof(Filter1), typeof(Filter2) });
@@ -46,34 +46,34 @@ public class FilterSupportTest
     }
 
     [Fact]
-    public void ThrowIfInvalidFileterTypeAllWith_fileterTypesがnullの場合は例外が発生する()
+    public void ThrowIfInvalidFilterTypeAllWith_filterTypesがnullの場合は例外が発生する()
     {
         Should.Throw<ArgumentNullException>(() => FilterSupport.ThrowIfInvalidFilterTypeAllWith(null));
     }
 
     [Fact]
-    public void ThrowIfInvalidFileterTypeAllWith_fileterTypesにnullが含まれる場合はfalseが返る()
+    public void ThrowIfInvalidFilterTypeAllWith_filterTypesにnullが含まれる場合はfalseが返る()
     {
         Should.Throw<ArgumentException>(() => FilterSupport.ThrowIfInvalidFilterTypeAllWith(
             new Type[] { typeof(Filter1), null, typeof(Filter2) }));
     }
 
     [Fact]
-    public void ThrowIfInvalidFileterTypeAllWith_fileterTypesにIFilterを継承していない型が含まれる場合はfalseが返る()
+    public void ThrowIfInvalidFilterTypeAllWith_filterTypesにIFilterを継承していない型が含まれる場合はfalseが返る()
     {
         Should.Throw<ArgumentException>(() => FilterSupport.ThrowIfInvalidFilterTypeAllWith(
             new Type[] { typeof(Filter1), typeof(string), typeof(Filter2) }));
     }
 
     [Fact]
-    public void ThrowIfInvalidFileterTypeAllWith_fileterTypesにデフォルトコンストラクターがない型が含まれる場合はfalseが返る()
+    public void ThrowIfInvalidFilterTypeAllWith_filterTypesにデフォルトコンストラクターがない型が含まれる場合はfalseが返る()
     {
         Should.Throw<ArgumentException>(() => FilterSupport.ThrowIfInvalidFilterTypeAllWith(
                 new Type[] { typeof(Filter1), typeof(Filter3), typeof(Filter2) }));
     }
 
     [Fact]
-    public void ThrowIfInvalidFileterTypeAllWith_fileterTypesが全てIFilterを継承してデフォルトコンストラクターがある型の場合はtrueが返る()
+    public void ThrowIfInvalidFilterTypeAllWith_filterTypesが全てIFilterを継承してデフォルトコンストラクターがある型の場合はtrueが返る()
     {
         FilterSupport.ThrowIfInvalidFilterTypeAllWith(
             new Type[] { typeof(Filter1), typeof(Filter2) });
